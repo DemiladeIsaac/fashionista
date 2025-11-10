@@ -2,10 +2,15 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import Footer from "../../../components/Footer";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useProductContext } from "../context/ProductContext";
 
 const Shop = () => {
   const [min, setMin] = useState(20);
   const [max, setMax] = useState(300);
+  const router = useRouter();
+  const { setSelectedProduct } = useProductContext();
 
   useEffect(() => {
     const minPercent = ((min - 20) / 280) * 100;
@@ -26,6 +31,12 @@ const Shop = () => {
     const value = Math.max(Number(e.target.value), min + 10);
     setMax(value);
   };
+
+  const handleClick = (product) => {
+    setSelectedProduct(product);
+    router.push(`/shop/${product.text}`);
+  };
+
   const filterOptions = [
     { text: "Dresses" },
     { text: "Tops" },
@@ -50,26 +61,31 @@ const Shop = () => {
       text: "Elegant Silk Blouse",
       price: "$89.99",
       img: "/images/blouse.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
     {
       text: "High-Waisted Skinny Jeans",
       price: "$75.00",
       img: "/images/skinnyjeans.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
     {
       text: "Leather Crossbody Bag",
       price: "$120.50",
       img: "/images/crossbody.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
     {
       text: "Classic Trench Coat",
       price: "$249.99",
       img: "/images/trench-coat.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
     {
       text: "Printed Maxi Dress",
       price: "$110.00",
       img: "/images/maxi-dress.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
     {
       text: "Comfortable Knit Sweater",
@@ -80,21 +96,25 @@ const Shop = () => {
       text: "Ankle Boots with Block Heel",
       price: "$135.00",
       img: "/images/ankleboots.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
     {
       text: "Stylish Sunglasses",
       price: "$45.00",
       img: "/images/glasses.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
     {
       text: "Sporty Cropped Hoodie",
       price: "$59.99",
       img: "/images/hoodie.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
     {
       text: "Elegant Pleated Skirt",
       price: "$70.00",
       img: "/images/skirt.png",
+      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
     },
   ];
   return (
@@ -216,8 +236,12 @@ const Shop = () => {
               All Products
             </h2>
             <div className="grid grid-cols-4 gap-4 mt-2">
-              {products.map((product) => (
-                <div className="flex flex-col gap-2">
+              {products.map((product, index) => (
+                <div
+                  key={index}
+                  className="cursor-pointer flex flex-col gap-2 hover:scale-105 transition"
+                  onClick={() => handleClick(product)}
+                >
                   <img
                     src={product.img}
                     alt={product.text}
