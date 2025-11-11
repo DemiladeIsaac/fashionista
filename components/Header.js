@@ -60,7 +60,15 @@ const Header = () => {
         />
       </div>
       <div className="flex items-center gap-1">
-        <Image src={Cart} alt="cart" width={20} height={20} />
+        <Link href="/cart">
+          <Image
+            src={Cart}
+            alt="cart"
+            width={20}
+            height={20}
+            className="cursor-pointer"
+          />
+        </Link>
         <Image
           src={Profile}
           alt="profile"
