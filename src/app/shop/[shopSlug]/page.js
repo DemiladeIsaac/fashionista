@@ -7,10 +7,12 @@ import { useRouter } from "next/navigation";
 import Footer from "../../../../components/Footer";
 
 export default function ProductDetailsPage() {
-  const { selectedProduct, setSelectedProduct } = useProductContext();
+  const { selectedProduct, setSelectedProduct, addToCart } =
+    useProductContext();
 
   const [size, setSize] = useState("XS");
   const [count, setCount] = useState(1);
+  const [mainImage, setMainImage] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -25,6 +27,12 @@ export default function ProductDetailsPage() {
   }, []);
 
   if (!selectedProduct) return <p>Loading...</p>;
+
+  useEffect(() => {
+    if (selectedProduct) {
+      setMainImage(selectedProduct.img);
+    }
+  }, [selectedProduct]);
 
   let activeClass = "bg-[#0D59F2FF] text-white cursor-pointer";
   let inactiveClass =
@@ -68,6 +76,12 @@ export default function ProductDetailsPage() {
     setSelectedProduct(product);
     router.push(`/shop/${product.text}`);
   };
+
+  const handleAddToCart = () => {
+    addToCart(selectedProduct, size, count);
+    alert(`${selectedProduct.text} (Size ${size}) added to cart!`);
+  };
+
   return (
     <>
       <div
@@ -76,18 +90,25 @@ export default function ProductDetailsPage() {
       >
         <div className="flex gap-6">
           <div className="flex flex-col">
-            <img
-              src={selectedProduct.img}
-              alt={selectedProduct.text}
-              className="w-[450px] h-[450px] object-cover rounded-md"
-            />
+            {mainImage && (
+              <img
+                src={mainImage}
+                alt={selectedProduct.text}
+                className="w-[450px] h-[450px] object-cover rounded-md"
+              />
+            )}
             <div className="flex items-center gap-1 mt-2">
               {selectedProduct?.extraImg?.map((extra, index) => (
                 <img
                   key={index}
                   src={extra}
                   alt="cloth"
-                  className="w-[92px] h-[92px] rounded-md"
+                  onClick={() => setMainImage(extra)}
+                  className={`w-[92px] h-[92px] rounded-md cursor-pointer border ${
+                    mainImage === extra
+                      ? "border-[#0D59F2FF] scale-105"
+                      : "border-transparent"
+                  } transition-all duration-200`}
                 />
               ))}
             </div>
@@ -166,19 +187,28 @@ export default function ProductDetailsPage() {
             <div className="mt-2">
               <p className="text-lg font-semibold text-[#171A1FFF]">Quantity</p>
               <div className="flex items-center">
-                <button className="w-10 h-10 px-2.5 cursor-pointer bg-white text-[#171A1FFF] border border-[#DEE1E6FF] rounded-md">
+                <button
+                  onClick={() => setCount((prev) => Math.max(1, prev - 1))}
+                  className="w-10 h-10 px-2.5 cursor-pointer bg-white text-[#171A1FFF] border border-[#DEE1E6FF] rounded-md"
+                >
                   -
                 </button>
-                <p className="w-16 h-10 text-center rounded-md bg-white text-2xl border border-[#DEE1E6FF] px-3">
+                <p className="w-16 h-10 text-center rounded-md bg-white text-2xl border border-[#DEE1E6FF] px-3 flex items-center justify-center">
                   {count}
                 </p>
-                <button className="w-10 h-10 px-2.5 bg-white cursor-pointer text-[#171A1FFF] border border-[#DEE1E6FF] rounded-md">
+                <button
+                  onClick={() => setCount((prev) => prev + 1)}
+                  className="w-10 h-10 px-2.5 bg-white cursor-pointer text-[#171A1FFF] border border-[#DEE1E6FF] rounded-md"
+                >
                   +
                 </button>
               </div>
             </div>
             <div className="mt-4">
-              <button className="bg-[#0D59F2FF] hover:bg-[#0A49C6FF] cursor-pointer w-[275px] h-10 px-3 font-medium text-white text-sm rounded-md">
+              <button
+                onClick={handleAddToCart}
+                className="bg-[#0D59F2FF] hover:bg-[#0A49C6FF] cursor-pointer w-[275px] h-10 px-3 font-medium text-white text-sm rounded-md"
+              >
                 Add to Cart
               </button>
             </div>

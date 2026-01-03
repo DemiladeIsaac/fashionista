@@ -1,23 +1,34 @@
-import React from "react";
+"use client";
+import React, { useMemo } from "react";
 import Footer from "../../../components/Footer";
+import { useProductContext } from "../context/ProductContext";
 
 const CartPage = () => {
-  const items = [
-    {
-      text: "Urban Kicks",
-      name: "Design White Sneakers",
-      size: "40",
-      price: "95.00",
-      img: "/images/sneakers.png",
-    },
-    {
-      text: "Modern Attire",
-      name: "Slim Fit Navy Blazer",
-      size: "M",
-      price: "120.00",
-      img: "/images/monochrome-top.png",
-    },
-  ];
+  const { cart, increaseQuantity, decreaseQuantity, removeFromCart } =
+    useProductContext();
+
+  const subtotal = useMemo(() => {
+    return cart.reduce((sum, item) => sum + item.priceValue * item.quantity, 0);
+  }, [cart]);
+
+  const shipping = cart.length > 0 ? 10 : 0;
+  const total = subtotal + shipping;
+  // const items = [
+  //   {
+  //     text: "Urban Kicks",
+  //     name: "Design White Sneakers",
+  //     size: "40",
+  //     price: "95.00",
+  //     img: "/images/sneakers.png",
+  //   },
+  //   {
+  //     text: "Modern Attire",
+  //     name: "Slim Fit Navy Blazer",
+  //     size: "M",
+  //     price: "120.00",
+  //     img: "/images/monochrome-top.png",
+  //   },
+  // ];
   return (
     <>
       <div
@@ -38,9 +49,9 @@ const CartPage = () => {
             Import duties are included. Estimated delivery in 5-7 business days.
           </p>
         </div>
-        <section className="flex items-center justify-between gap-2 mt-8">
+        <section className="flex justify-between gap-2 mt-8">
           <div className="flex flex-col gap-6">
-            {items.map((item, index) => (
+            {cart.map((item, index) => (
               <div
                 key={index}
                 className="flex items-center w-[880px] justify-between"
@@ -56,13 +67,16 @@ const CartPage = () => {
                     </p>
                     <p className="text-sm text-[#565D6DFF]">Size:{item.size}</p>
                     <p className="text-lg text-[#171A1FFF] font-bold">
-                      ${item.price}
+                      ${item.priceValue.toFixed(2)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="flex items-center gap-1">
-                    <button className="text-[#171A1FFF] flex items-center justify-center text-2xl px-2.5 w-8 h-8 rounded-md bg-white border border-[#DEE1E6FF]">
+                    <button
+                      onClick={() => decreaseQuantity(index)}
+                      className="text-[#171A1FFF] flex items-center justify-center text-2xl px-2.5 w-8 h-8 rounded-md bg-white border border-[#DEE1E6FF]"
+                    >
                       <span>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -81,9 +95,12 @@ const CartPage = () => {
                       </span>
                     </button>
                     <p className="px-3 w-16 h-10 text-2xl text-center bg-white border border-[#DEE1E6FF] text-[#171A1FFF]">
-                      1
+                      {item.quantity}
                     </p>
-                    <button className="text-[#171A1FFF] flex justify-center items-center text-2xl px-2.5 w-8 h-8 rounded-md bg-white border border-[#DEE1E6FF]">
+                    <button
+                      onClick={() => increaseQuantity(index)}
+                      className="text-[#171A1FFF] flex justify-center items-center text-2xl px-2.5 w-8 h-8 rounded-md bg-white border border-[#DEE1E6FF]"
+                    >
                       <span>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +119,10 @@ const CartPage = () => {
                       </span>
                     </button>
                   </div>
-                  <button className="text-3xl text-[#565D6DFF]">
+                  <button
+                    onClick={() => removeFromCart(index)}
+                    className="text-3xl text-[#565D6DFF]"
+                  >
                     <span>
                       <img src="/images/x.svg" className="w-5 h-5" />
                     </span>
@@ -111,23 +131,25 @@ const CartPage = () => {
               </div>
             ))}
           </div>
-          <div className="bg-white border border-[#DEE1E6FF] shadow-md rounded-md w-[427px] p-4">
+          <div className="bg-white border border-[#DEE1E6FF] shadow-md rounded-md w-[427px] h-[280px] p-4">
             <p className="text-xl font-bold text-[#171A1FFF]">Order Summary</p>
             <div>
               <div className="flex items-center justify-between">
                 <p>Subtotal:</p>
-                <p>$365.00</p>
+                <p>${subtotal.toFixed(2)}</p>
               </div>
               <div className="flex items-center justify-between">
                 <p>Shipping:</p>
-                <p>$10.00</p>
+                <p>${shipping.toFixed(2)}</p>
               </div>
               <div className="flex items-center justify-between border-t border-[#DEE1E6FF]">
                 <p className="text-lg font-bold text-[#171A1FFF]">Total</p>
-                <p className="text-lg font-bold text-[#171A1FFF]">$375.00</p>
+                <p className="text-lg font-bold text-[#171A1FFF]">
+                  ${total.toFixed(2)}
+                </p>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-4">
               <button className="text-white text-base font-medium bg-[#0D59F2FF] rounded-md px-3 w-[393px] h-11 hover:text-white hover:bg-[#0A49C6FF] cursor-pointer">
                 Proceed to Checkout
               </button>

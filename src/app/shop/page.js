@@ -9,8 +9,34 @@ import { useProductContext } from "../context/ProductContext";
 const Shop = () => {
   const [min, setMin] = useState(20);
   const [max, setMax] = useState(300);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
+
   const router = useRouter();
   const { setSelectedProduct } = useProductContext();
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleBrandChange = (brand) => {
+    setSelectedBrands((prev) =>
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
+    );
+  };
+
+  const getPriceNumber = (price) => Number(price.replace("$", ""));
+
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    setSelectedBrands([]);
+    setMin(20);
+    setMax(300);
+  };
 
   useEffect(() => {
     const minPercent = ((min - 20) / 280) * 100;
@@ -42,10 +68,12 @@ const Shop = () => {
     { text: "Tops" },
     { text: "Blouses" },
     { text: "Skirts" },
-    { text: "Outerwear" },
-    { text: "Activewear" },
-    { text: "Lingerie" },
+    { text: "Jeans" },
+    { text: "Bags" },
+    { text: "Coats" },
     { text: "Shoes" },
+    { text: "Glasses" },
+    { text: "Hoodie" },
   ];
 
   const brandOptions = [
@@ -61,62 +89,118 @@ const Shop = () => {
       text: "Elegant Silk Blouse",
       price: "$89.99",
       img: "/images/blouse.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: [
+        "/images/blouse-one.png",
+        "/images/blouse-two.png",
+        "/images/blouse.png",
+      ],
+      type: "Blouses",
+      brand: "Zara",
     },
     {
       text: "High-Waisted Skinny Jeans",
       price: "$75.00",
       img: "/images/skinnyjeans.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: [
+        "/images/blouse-one.png",
+        "/images/blouse-two.png",
+        "/images/skinnyjeans.png",
+      ],
+      type: "Jeans",
+      brand: "Chanel",
     },
     {
       text: "Leather Crossbody Bag",
       price: "$120.50",
       img: "/images/crossbody.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: [
+        "/images/blouse-one.png",
+        "/images/blouse-two.png",
+        "/images/crossbody.png",
+      ],
+      type: "Bags",
+      brand: "Prada",
     },
     {
       text: "Classic Trench Coat",
       price: "$249.99",
       img: "/images/trench-coat.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: [
+        "/images/blouse-one.png",
+        "/images/blouse-two.png",
+        "/images/trench-coat.png",
+      ],
+      type: "Coats",
+      brand: "H & M",
     },
     {
       text: "Printed Maxi Dress",
       price: "$110.00",
       img: "/images/maxi-dress.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: [
+        "/images/blouse-one.png",
+        "/images/blouse-two.png",
+        "/images/maxi-dress.png",
+      ],
+      type: "Dresses",
+      brand: "Zara",
     },
     {
       text: "Comfortable Knit Sweater",
       price: "$65.00",
       img: "/images/sweater.png",
+      type: "Tops",
+      brand: "Zara",
     },
     {
       text: "Ankle Boots with Block Heel",
       price: "$135.00",
       img: "/images/ankleboots.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: ["/images/blouse-one.png", "/images/ankleboots.png"],
+      type: "Shoes",
+      brand: "Zara",
     },
     {
       text: "Stylish Sunglasses",
       price: "$45.00",
       img: "/images/glasses.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: ["/images/blouse-one.png", "/images/glasses.png"],
+      type: "Glasses",
+      brand: "H & M",
     },
     {
       text: "Sporty Cropped Hoodie",
       price: "$59.99",
       img: "/images/hoodie.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: ["/images/blouse-one.png", "/images/hoodie.png"],
+      type: "Hoodie",
+      brand: "Nike",
     },
     {
       text: "Elegant Pleated Skirt",
       price: "$70.00",
       img: "/images/skirt.png",
-      extraImg: ["/images/blouse-one.png", "/images/blouse-two.png"],
+      extraImg: ["/images/blouse-one.png", "/images/skirt.png"],
+      type: "Skirts",
+      brand: "H & M",
     },
   ];
+
+  const filteredProducts = products.filter((product) => {
+    const price = getPriceNumber(product.price);
+
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(product.type);
+
+    const matchesBrand =
+      selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+
+    const matchesPrice = price >= min && price <= max;
+
+    return matchesCategory && matchesBrand && matchesPrice;
+  });
+
   return (
     <>
       <div
@@ -143,6 +227,8 @@ const Shop = () => {
                 >
                   <input
                     type="checkbox"
+                    checked={selectedCategories.includes(filter.text)}
+                    onChange={() => handleCategoryChange(filter.text)}
                     className="w-4 h-4 border border-gray-300 rounded-sm text-blue-600 focus:ring-blue-500 focus:ring-1"
                   />
                   <span>{filter.text}</span>
@@ -216,6 +302,8 @@ const Shop = () => {
                 >
                   <input
                     type="checkbox"
+                    checked={selectedBrands.includes(brand.text)}
+                    onChange={() => handleBrandChange(brand.text)}
                     className="w-4 h-4 border border-gray-300 rounded-sm text-blue-600 focus:ring-blue-500 focus:ring-1"
                   />
                   <span>{brand.text}</span>
@@ -223,10 +311,13 @@ const Shop = () => {
               ))}
             </div>
             <div className="flex flex-col mt-4">
-              <button className="w-70 h-10 px-3 text-white bg-[#0D59F2FF] rounded-md font-medium text-sm cursor-pointer">
+              {/* <button className="w-70 h-10 px-3 text-white bg-[#0D59F2FF] rounded-md font-medium text-sm cursor-pointer">
                 Apply Filters
-              </button>
-              <button className="mt-2 w-70 h-10 border border-[#DEE1E6FF] px-3 font-medium text-sm rounded-md text-[#171A1FFF] bg-white cursor-pointer">
+              </button> */}
+              <button
+                onClick={clearFilters}
+                className="mt-2 w-70 h-10 border border-[#DEE1E6FF] px-3 font-medium text-sm rounded-md text-[#171A1FFF] bg-white cursor-pointer"
+              >
                 Clear Filters
               </button>
             </div>
@@ -236,7 +327,7 @@ const Shop = () => {
               All Products
             </h2>
             <div className="grid grid-cols-4 gap-4 mt-2">
-              {products.map((product, index) => (
+              {filteredProducts.map((product, index) => (
                 <div
                   key={index}
                   className="cursor-pointer flex flex-col gap-2 hover:scale-105 transition"
