@@ -12,8 +12,8 @@ const Header = () => {
   const links = [
     { text: "Home", to: "/" },
     { text: "Shop", to: "/shop" },
-    { text: "Categories", to: "/categories" },
-    { text: "Sale", to: "/sale" },
+    // { text: "Categories", to: "/categories" },
+    // { text: "Sale", to: "/sale" },
   ];
   return (
     <div className="flex items-center justify-between py-4 px-6">
